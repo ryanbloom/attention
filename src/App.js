@@ -9,7 +9,7 @@ function CoverPage(props) {
             <div className='mt-2 text-gray-400'><a href='http://ryan-bloom.com' className='subtle'>Ryan Bloom</a> | July 2022</div>
         </div>
         <p>
-            This is a visualization of <a href='https://huggingface.co/gpt2'>GPT-2-small</a> predicting tokens in a string of text. Best viewed on a large screen.
+            This is a visualization of <a href='https://huggingface.co/gpt2' target='_blank'>GPT-2-small</a> predicting tokens in a string of text. Best viewed on a large screen.
         </p>
         Text: <select value={props.selectedSentenceIndex} onChange={e => props.selectSentence(e.target.value)}>
             {
@@ -24,8 +24,8 @@ function CoverPage(props) {
         </p>
         <p>
             The word in each cell is an intermediate "best guess" computed using a variant
-            of <a href='https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens'>nostalgebraist's logits lens</a> technique.
-            (Unlike nostalgebraist, I'm taking activations after the MLP, and applying the final LayerNorm before the output layer.
+            of <a href='https://www.lesswrong.com/posts/AcKRB8wDpdaN6v6ru/interpreting-gpt-the-logit-lens' target='_blank'>nostalgebraist's logits lens</a> technique.
+            (Unlike nostalgebraist, I'm taking activations after the MLP, and applying the final layer norm before the output layer.
             This gives similar but more confident results: later layers sometimes concentrate probability on a single token.)
             The rightmost column is expanded to show "runner-up" tokens as well. A token's brightness corresponds to its logit.
         </p>
