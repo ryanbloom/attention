@@ -22,7 +22,7 @@ export function App() {
     const runnerUpWidth = 400
     let topChoicesWidth = 0
     
-    let children = document.querySelectorAll('.outer-column')
+    let children = document.querySelectorAll('.fixed-column')
     let maxX = document.body.getBoundingClientRect().width
     let lastFixedIndex = 0
     let lastFixedChild = null
@@ -60,7 +60,8 @@ export function App() {
     attention = data.columns[lastFixedIndex].attention
     let columns = data.columns.map((t, i) =>
         <Column data={t} index={i} key={i}
-            topOnly={i != lastFixedIndex}
+            invisible={i >= slidingIndex}
+            sliding={false} renderAll={i == slidingIndex - 1}
             attentionPattern={i <= lastFixedIndex && attention[i]}
             hoveredToken={i == lastFixedIndex ? hoveredToken : null}
             setHoveredToken={i == lastFixedIndex ? setHoveredToken : null}>
@@ -70,18 +71,18 @@ export function App() {
     let slidingX = 0
     if (lastFixedChild) {
         let lastFixedLeft = lastFixedContainer.getBoundingClientRect().left
-        let lastFixedRight = lastFixedLeft + lastFixedColumnExpandedWidth
+        let lastFixedRight = lastFixedLeft + lastFixedColumnExpandedWidth - 1
         let gap = window.innerWidth - lastFixedRight
         let maxGap = 100
         if (slidingTopColumn) {
             maxGap = slidingTopColumn.getBoundingClientRect().width
         }
         let slidingFraction = 1 - (gap / maxGap)
-        slidingX = (slidingFraction * expandedSlidingColumnWidth)
+        slidingX = slidingFraction * (expandedSlidingColumnWidth + 10)
     }
     if (slidingIndex < data.columns.length) {
         let slidingColumnData = data.columns[slidingIndex]
-        slidingColumn = <Column data={slidingColumnData} index={slidingIndex} topOnly={false}>
+        slidingColumn = <Column data={slidingColumnData} index={slidingIndex} sliding={true} renderAll={true}>
             hoveredToken={hoveredToken} setHoveredToken={setHoveredToken}
         </Column>
     }
@@ -103,7 +104,7 @@ export function App() {
                     <span className='py-1 pr-3'>Input</span>
                 </div>
                 {
-                    layerLabels.map((l, i) => 
+                    layerLabels.map((l, i) =>
                         <div key={i} className='flex grow flex-col justify-end items-end'>
                             <span className='pr-3'>{l}</span>
                         </div>
@@ -117,7 +118,6 @@ export function App() {
             {columns}
         </div>
 
-        {/* TODO: make sure the sliding column animates all the way before snapping into place */}
         <div style={{position: 'absolute', top: '0', right: -(slidingX) + 'px', minHeight: '100vh'}} className={`${lastFixedChild ? 'block' : 'hidden'} sliding-column z-20 pointer-events-none flex flex-col h-full`}>
             {slidingColumn}
         </div>

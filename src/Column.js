@@ -67,8 +67,8 @@ export function Column(props) {
     let t = props.data
     
     let rest = []
-    if (!props.topOnly) {
-        let cells = []
+    let cells = []
+    if (props.renderAll) {
         for (let j = 0; j < t.rows.length; j++) {
             let l = t.rows[j]
             let token_cells = []
@@ -89,14 +89,18 @@ export function Column(props) {
                 </div>
             )
         }
-        rest = <div className='flex flex-col overflow-hidden' key={props.index} style={{width: '400px'}}>
-            <div style={{height: '27px'}}></div>
-                {cells}
-            <div style={{height: '27px'}}></div>
-        </div>
     }
+    rest = <div className='flex flex-col overflow-hidden' key={props.index} style={{width: '400px'}}>
+        <div style={{height: '27px'}}></div>
+            {cells}
+        <div style={{height: '27px'}}></div>
+    </div>
 
-    return <div key={props.index} className='outer-column flex flex-row snap-end items-stretch grow bg-black'>
+    let className = 'outer-column flex flex-row snap-end items-stretch grow bg-black'
+    if (!props.sliding) {
+        className += ' fixed-column'
+    }
+    return <div key={props.index} style={{position: props.sliding ? 'static' : 'relative', left: (-400 * props.index) + 'px', 'visibility': props.invisible ? 'hidden' : 'visible'}} className={className}>
         <TopColumn hoveredToken={props.hoveredToken}
             hover={props.setHoveredToken} data={props.data}
             attentionPattern={props.attentionPattern}>
