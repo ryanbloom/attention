@@ -1,6 +1,7 @@
 import React from 'react'
 import { Column } from './Column'
 import allData from '../data.json'
+import dataKeys from '../dataKeys.json'
 import { CoverPage } from './CoverPage'
 
 export function App() {
@@ -56,9 +57,9 @@ export function App() {
         expandedSlidingColumnWidth = slidingTopColumn.getBoundingClientRect().width + runnerUpWidth
     }
     
-    let data = allData.data[selectedSentenceIndex]
-    attention = data.columns[lastFixedIndex].attention
-    let columns = data.columns.map((t, i) =>
+    let data = allData[dataKeys.data][selectedSentenceIndex]
+    attention = data[dataKeys.columns][lastFixedIndex][dataKeys.attention]
+    let columns = data[dataKeys.columns].map((t, i) =>
         <Column data={t} index={i} key={i}
             invisible={i >= slidingIndex}
             sliding={false} renderAll={i == slidingIndex - 1}
@@ -80,8 +81,8 @@ export function App() {
         let slidingFraction = 1 - (gap / maxGap)
         slidingX = slidingFraction * (expandedSlidingColumnWidth + 10)
     }
-    if (slidingIndex < data.columns.length) {
-        let slidingColumnData = data.columns[slidingIndex]
+    if (slidingIndex < data[dataKeys.columns].length) {
+        let slidingColumnData = data[dataKeys.columns][slidingIndex]
         slidingColumn = <Column data={slidingColumnData} index={slidingIndex} sliding={true} renderAll={true}>
             hoveredToken={hoveredToken} setHoveredToken={setHoveredToken}
         </Column>
@@ -91,10 +92,10 @@ export function App() {
 
     return <div className='relative'>
 
-        <div ref={scrollContainer} className='flex flex-row w-full min-h-screen overflow-scroll snap-x snap-mandatory hide-scrollbars'>
+        <div ref={scrollContainer} className='flex flex-row w-full min-h-screen overflow-scroll snap-x snap-mandatory'>
             <div className='p-12 box-border shrink-0'
                 style={{flexBasis: 'calc(100% - 400px - 43px - 5rem)'}}>
-                <div className='flex flex-col w-full'>
+                <div className='flex flex-col w-full pl-12'>
                     <CoverPage selectedSentenceIndex={selectedSentenceIndex} selectSentence={selectSentence} />
                 </div>
             </div>

@@ -5,15 +5,39 @@ from transformers import pipeline
 
 from modeling_gpt2 import GPT2LMHeadModel
 
+# We're going to be using these keys a lot, so make them short
+keys = {
+    'sentences': 's',
+    'data': 'd',
+    'columns': 'c',
+    'input_token': 'i',
+    'output_token': 'o',
+    'target_token': 't',
+    'rows': 'r',
+    'top_token': 'p',
+    'correct_prob': 'b',
+    'top_tokens': 'k',
+    'attention': 'a',
+    'heads': 'h',
+    'reduced': 'e'
+}
+
 def clean_token(t):
+    t = t.replace('Ġ', ' ')
+    t = t.replace('Ċ', ' ')
     return t
-    # return t.replace('Ġ', '')
 
 def clean_tokens(ts):
     return [clean_token(t) for t in list(ts)]
 
+def approx(x):
+    if isinstance(x, float):
+        return round(x, 3)
+    if isinstance(x, list):
+        return [approx(y) for y in x]
+
 def probs_to_dict(p, k=None):
-    all_probs = sorted(zip(all_tokens, p), key=lambda x: x[1], reverse=True)
+    all_probs = sorted(zip(all_tokens, approx(p)), key=lambda x: x[1], reverse=True)
     if k is None:
         return dict(all_probs)
     else:
@@ -97,28 +121,28 @@ for _, s in sentences:
 
             if t+1 < len(tokens):
                 correct_token = tokens[t+1]
-                correct_prob = probs[correct_token].item()
+                correct_prob = approx(probs[correct_token].item())
             else:
                 correct_prob = 0
 
             row = {
-                'top_token': output_token,
-                'correct_prob': correct_prob,
-                'top_tokens': probs_to_dict(probs.numpy().tolist(), k=10),
+                keys['top_token']: output_token,
+                keys['correct_prob']: correct_prob,
+                keys['top_tokens']: probs_to_dict(probs.numpy().tolist(), k=10),
             }
             
             data_rows.append(row)
 
         col = {
-            'input_token': input_tokens[t],
-            'output_token': output_tokens[t],
-            'target_token': input_tokens[t+1] if t+1 < len(input_tokens) else '',
-            'rows': data_rows,
-            'attention': [
+            keys['input_token']: input_tokens[t],
+            keys['output_token']: output_tokens[t],
+            keys['target_token']: input_tokens[t+1] if t+1 < len(input_tokens) else '',
+            keys['rows']: data_rows,
+            keys['attention']: [
                 [
                     {
-                        'heads': att_heads[t][i][j].tolist(),
-                        'reduced': att_reduced[t][i][j].item(),
+                        keys['heads']: approx(att_heads[t][i][j].tolist()),
+                        keys['reduced']: approx(att_reduced[t][i][j].item()),
                     } for j in range(att_heads.shape[2])
                 ] for i in range(att_heads.shape[1])
             ]
@@ -127,13 +151,13 @@ for _, s in sentences:
         data_columns.append(col)
 
     data = {
-        'columns': data_columns[:-1],
+        keys['columns']: data_columns[:-1],
     }
     sentence_datasets.append(data)
 
 all_data = {
-    'sentences': [short for short, _ in sentences],
-    'data': sentence_datasets
+    keys['sentences']: [short for short, _ in sentences],
+    keys['data']: sentence_datasets
 }
 with open('data.json', 'w+') as f:
     json.dump(all_data, f, indent='\t')

@@ -1,5 +1,6 @@
 import React from 'react'
 import allData from '../data.json'
+import dataKeys from '../dataKeys.json'
 
 export function CoverPage(props) {
     return <div style={{maxWidth: '600px'}}>
@@ -12,7 +13,7 @@ export function CoverPage(props) {
         </p>
         Text: <select value={props.selectedSentenceIndex} onChange={e => props.selectSentence(e.target.value)}>
             {
-                allData.sentences.map((s, i) =>
+                allData[dataKeys.sentences].map((s, i) =>
                     <option key={i} value={i}>{s}</option>
                 )
             }

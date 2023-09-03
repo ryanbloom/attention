@@ -1,0 +1,15 @@
+{
+    "sentences": "s",
+    "data": "d",
+    "columns": "c",
+    "input_token": "i",
+    "output_token": "o",
+    "target_token": "t",
+    "rows": "r",
+    "top_token": "p",
+    "correct_prob": "b",
+    "top_tokens": "k",
+    "attention": "a",
+    "heads": "h",
+    "reduced": "e"
+}

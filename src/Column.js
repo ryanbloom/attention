@@ -1,6 +1,5 @@
 import React from 'react'
-
-const cleanToken = t => t.replace('Ġ', ' ').replace('Ċ', ' ')
+import dataKeys from '../dataKeys.json'
 
 const maxLogit = Math.log(1.0)
 const minLogit = Math.log(1e-5)
@@ -15,7 +14,7 @@ function Attention(props) {
 
     return <div className='z-10 grow flex flex-col'>
         {
-            props.weight.heads.map((w, i) =>
+            props.weight[dataKeys.heads].map((w, i) =>
                 <div className='w-full grow basis-1' key={i} style={{background: headColor(i), opacity: w}}></div>
             )
         }
@@ -24,8 +23,11 @@ function Attention(props) {
 
 function ProbCell(props) {
     let key = props.k
+    let opacity = 0
 
-    let opacity = (Math.log(props.prob) - minLogit) / (maxLogit - minLogit)
+    if (props.prob > 0) {
+        opacity = (Math.log(props.prob) - minLogit) / (maxLogit - minLogit)
+    }
     let attention
     if ('attention' in props) {
         attention = <Attention weight={props.attention} />
@@ -40,26 +42,26 @@ function ProbCell(props) {
     return <div className='flex flex-col grow justify-center' onMouseOver={_ => props.hover && props.hover(key)} onMouseOut={_ => props.hover && props.hover(null)}>
             {attention}
             <div className='px-1 flex flex-col grow justify-end h-5' style={props.hoveredToken && props.hoveredToken == key ? hoverMatchStyle : {}}>
-                <span style={{opacity: opacity}}>{cleanToken(key)}</span>
+                <span style={{opacity: opacity}}>{key}</span>
             </div>
     </div>
 }
 
 export function TopColumn(props) {
     return <div className='top-column grow' style={{display: "flex", flexDirection: "column"}}>
-        <div className='p-1'>{cleanToken(props.data.input_token)}</div>
+        <div className='p-1'>{props.data[dataKeys.input_token]}</div>
         {
-            props.data.rows.map((r, i) => {
-                const top_token = Object.keys(r.top_tokens)[0]
+            props.data[dataKeys.rows].map((r, i) => {
+                const top_token = Object.keys(r[dataKeys.top_tokens])[0]
                 return <div key={i} className='flex flex-row grow'>
                     <ProbCell hoveredToken={props.hoveredToken} hover={props.hover}
                     r={r} k={top_token} isTop={true}
-                    prob={r.top_tokens[top_token]}
+                    prob={r[dataKeys.top_tokens][top_token]}
                     attention={props.attentionPattern && props.attentionPattern[i]}/>
                 </div>
             })
         }
-        <div className='p-1'>{cleanToken(props.data.target_token)}</div>
+        <div className='p-1'>{props.data[dataKeys.target_token]}</div>
     </div>
 }
 
@@ -69,13 +71,13 @@ export function Column(props) {
     let rest = []
     let cells = []
     if (props.renderAll) {
-        for (let j = 0; j < t.rows.length; j++) {
-            let l = t.rows[j]
+        for (let j = 0; j < t[dataKeys.rows].length; j++) {
+            let l = t[dataKeys.rows][j]
             let token_cells = []
-            let top_tokens = Object.keys(l.top_tokens)
+            let top_tokens = Object.keys(l[dataKeys.top_tokens])
             for (let ki = 1; ki < top_tokens.length; ki++) {
                 let key = top_tokens[ki]
-                let prob = l.top_tokens[key]
+                let prob = l[dataKeys.top_tokens][key]
                 token_cells.push(
                     <ProbCell hoveredToken={props.hoveredToken}
                         hover={props.setHoveredToken}
